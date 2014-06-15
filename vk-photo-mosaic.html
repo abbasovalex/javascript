@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Vkontakte Photo Mosaic</title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div id="vk_photos"></div>
+        <div id="vk_api_transport"></div>
+        <script type="text/javascript"> 
+            window.vkAsyncInit = function() {
+                VK.init({
+                    apiId: 4008429
+                });
+
+                /*
+                VK.Auth.getLoginStatus(function authInfo(response) {
+                    console.log(response);
+                });
+                */
+                var clients = {
+                    count: undefined,
+                    ids: [],
+                    photos: []
+                };
+                VK.Api.call('groups.getMembers', {group_id: 'greatlukum'}, function(r){
+                    console.log(r);
+                    if (r.response) {
+                        clients.count = r.response.count;
+                        clients.ids = r.response.users;
+                        VK.Api.call('users.get', {user_ids: clients.ids, fields: 'photo_50'}, function(r2){
+                            if (r2.response) {
+                                var imgs = [],
+                                    img = undefined,
+                                    i = undefined,
+                                    user = undefined;
+                                for (i in r2.response) {
+                                    user = r2.response[i];
+                                    img = new Image(50, 50);
+                                    if (user.photo_50.indexOf('deactivated') > -1) break;
+                                    img.src = user.photo_50;
+                                    imgs.push(jQuery('<div/>').append(img).html());
+                                }
+                                console.log(imgs.join());
+                                jQuery('#vk_photos').html(imgs.join());
+                            }
+                        });
+                    }
+                });
+
+            };
+
+          setTimeout(function() {
+            var el = document.createElement("script");
+            el.type = "text/javascript";
+            el.src = "//vk.com/js/api/openapi.js";
+            el.async = true;
+            document.getElementById("vk_api_transport").appendChild(el);
+          }, 0);
+
+        </script>
+    </body>
+</html>
